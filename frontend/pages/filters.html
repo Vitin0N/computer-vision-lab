@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>VisionLab - Filtros</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <!-- Header Padrão -->
+  <header class="top-header">
+    <a href="/" class="logo-area" title="Início">
+      <div class="logo-icon"><img src="../assets/img/cv_logo.png" alt="Logo"></div>
+      <span class="logo-text">Computer Vision Lab</span>
+    </a>
+
+    <!-- Links de navegação entre as páginas -->
+    <nav class="nav-tabs">
+      <a href="/pages/filters.html" class="nav-tab active">Filtros</a>
+    </nav>
+
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button class="btn-camera" id="btnWebcam">Usar Câmera</button>
+      <button id="themeToggle" class="icon-action-btn" title="Alternar tema"></button>
+    </div>
+  </header>
+
+  <div class="main-wrapper">
+    <!-- Sidebar com sub-operações de filtros -->
+    <aside class="sidebar">
+      <span class="sidebar-title">Filtros</span>
+      <button class="subfilter-btn active" data-op="canny">Bordas Canny</button>
+      <button class="subfilter-btn" data-op="sobel">Gradiente Sobel</button>
+      <button class="subfilter-btn" data-op="blur">Gaussian Blur</button>
+    </aside>
+
+    <!-- Workspace Lado a Lado -->
+    <main class="workspace">
+      <div class="pipeline-container">
+        <!-- Entrada -->
+        <section class="card">
+          <div class="card-header"><span>Original</span></div>
+          <div class="image-dropzone">
+            <span class="placeholder-text">Nenhuma imagem carregada</span>
+            <img id="previewOriginal" style="display: none;" alt="Original" />
+          </div>
+          <div class="card-footer">
+            <input type="file" id="fileUpload" accept="image/*" style="display: none;" />
+            <button class="btn-primary" onclick="document.getElementById('fileUpload').click()">Enviar Imagem</button>
+          </div>
+        </section>
+
+        <div class="pipeline-arrow">&rarr;</div>
+
+        <!-- Saída -->
+        <section class="card">
+          <div class="card-header">
+            <span>Processada</span>
+            <span id="latencyBadge" style="font-size: 11px; color: var(--accent-color);">Pronto</span>
+          </div>
+          <div class="image-dropzone">
+            <span class="placeholder-text">O resultado aparecerá aqui</span>
+            <img id="previewResult" style="display: none;" alt="Resultado" />
+          </div>
+          <div class="card-footer right">
+            <a id="btnDownload" class="btn-secondary" style="display: none; text-decoration: none;" download="resultado.jpg">Baixar</a>
+          </div>
+        </section>
+      </div>
+
+      <!-- Parâmetros do filtro -->
+      <section class="params-bar">
+        <div class="param-group">
+          <label>Limiar 1: <span id="val1">100</span></label>
+          <input type="range" id="p1" min="0" max="255" value="100" />
+        </div>
+        <div class="param-group">
+          <label>Limiar 2: <span id="val2">200</span></label>
+          <input type="range" id="p2" min="0" max="255" value="200" />
+        </div>
+        <button class="btn-primary" id="btnExecute" style="margin-left: auto;">Aplicar Filtro</button>
+      </section>
+    </main>
+  </div>
+
+  <!-- Importa apenas o script específico desta página -->
+  <script type="module" src="../assets/js/filters.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Computer Vision Lab // Plataforma de Visão Computacional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Barra de Navegação -->
+  <header class="main-header">
+    <a href="/" class="brand">
+      <div class="logo-icon"><img src="../assets/img/cv_logo.png" alt="Logo"></div>
+      <span class="brand-name">Computer Vision Lab</span>
+    </a>
+
+    <!-- Menu Central com Dropdown de Recursos -->
+    <nav class="nav-menu">
+      <a href="#sobre" class="nav-link">Sobre</a>
+      
+      <!-- Dropdown Recursos que leva às páginas -->
+      <div class="dropdown">
+        <button class="dropdown-btn">
+          Recursos
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="dropdown-menu">
+          <a href="/pages/filters.html" class="dropdown-item">
+            <strong>Filtros & Bordas</strong>
+            <small>Canny, Sobel, Blur Gaussiano</small>
+          </a>
+          <button type="button" class="dropdown-item" disabled title="Recurso indisponível">
+            <strong>Detecção & Cores</strong>
+            <small>Rastreamento HSV, Contornos · Em breve</small>
+          </button>
+          <button type="button" class="dropdown-item" disabled title="Recurso indisponível">
+            <strong>Segmentação</strong>
+            <small>Threshold Otsu e Morfologia · Em breve</small>
+          </button>
+        </div>
+      </div>
+
+      <a href="#algoritmos" class="nav-link">Algoritmos</a>
+      <a href="https://github.com/Vitin0N/computer-vision-lab" target="_blank" class="nav-link">Repositório</a>
+    </nav>
+
+    <!-- Ações no Canto Direito -->
+    <div class="header-actions">
+      <a href="/pages/filters.html" class="btn-entrar">Abrir Lab</a>
+      
+    <!-- Tema -->
+      <button id="themeToggle" class="icon-action-btn" title="Alternar tema">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Centralizado -->
+  <main class="hero-section">
+    <h1 class="hero-title">
+      Estudos de visão computacional,<br>em um só laboratório.
+    </h1>
+    
+    <p class="hero-subtitle">
+      Teste filtros clássicos, rastreie cores em tempo real e explore detectores de bordas e morfologia matemática com processamento local em OpenCV.
+    </p>
+
+    <!-- Botões em Pílula -->
+    <div class="cta-group">
+      <a href="/pages/filters.html" class="btn-pill-primary">
+        Explorar recursos
+      </a>
+      
+      <button type="button" class="btn-pill-secondary" disabled title="Recurso indisponível">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Testar câmera & vídeo · Em breve
+      </button>
+    </div>
+
+    <!-- Links de Rodapé -->
+    <div class="quick-links">
+      <a href="https://github.com/Vitin0N/computer-vision-lab" target="_blank" class="quick-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        Ver código no GitHub
+      </a>
+    </div>
+  </main>
+
+  <script type="module" src="assets/js/main.js"></script>
+
+</body>
+</html>
