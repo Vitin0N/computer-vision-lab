@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
+  
   <!-- Header Padrão -->
   <header class="top-header">
     <a href="/" class="logo-area" title="Início">
@@ -28,9 +29,54 @@
     <!-- Sidebar com sub-operações de filtros -->
     <aside class="sidebar">
       <span class="sidebar-title">Filtros</span>
-      <button class="subfilter-btn active" data-op="canny">Bordas Canny</button>
-      <button class="subfilter-btn" data-op="sobel">Gradiente Sobel</button>
-      <button class="subfilter-btn" data-op="blur">Gaussian Blur</button>
+
+      <details class="filter-category" open>
+        <summary>Detecção de bordas</summary>
+        <div class="filter-options">
+          <button class="subfilter-btn active" data-op="canny">Bordas Canny</button>
+          <button class="subfilter-btn" data-op="sobel">Gradiente Sobel</button>
+        </div>
+      </details>
+
+      <details class="filter-category">
+        <summary>Desfoque</summary>
+        <div class="filter-options">
+          <button class="subfilter-btn" data-op="blur">Gaussian Blur</button>
+          <button class="subfilter-btn" disabled>Blur mediano <small>Em breve</small></button>
+        </div>
+      </details>
+
+      <details class="filter-category">
+        <summary>Contraste</summary>
+        <div class="filter-options">
+          <button class="subfilter-btn" disabled>Equalização <small>Em breve</small></button>
+          <button class="subfilter-btn" disabled>CLAHE <small>Em breve</small></button>
+        </div>
+      </details>
+
+      <details class="filter-category">
+        <summary>Morfologia</summary>
+        <div class="filter-options">
+          <button class="subfilter-btn" disabled>Erosão <small>Em breve</small></button>
+          <button class="subfilter-btn" disabled>Dilatação <small>Em breve</small></button>
+        </div>
+      </details>
+
+      <details class="filter-category">
+        <summary>Segmentação</summary>
+        <div class="filter-options">
+          <button class="subfilter-btn" disabled>Threshold Otsu <small>Em breve</small></button>
+          <button class="subfilter-btn" disabled>Threshold adaptativo <small>Em breve</small></button>
+        </div>
+      </details>
+
+      <details class="filter-category">
+        <summary>Formas</summary>
+        <div class="filter-options">
+          <button class="subfilter-btn" disabled>Contornos <small>Em breve</small></button>
+          <button class="subfilter-btn" disabled>Linhas de Hough <small>Em breve</small></button>
+        </div>
+      </details>
     </aside>
 
     <!-- Workspace Lado a Lado -->
