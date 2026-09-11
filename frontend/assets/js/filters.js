@@ -1,5 +1,5 @@
 import { initTheme } from './shared/theme.js';
-import { sendImage } from './shared/api.js';
+import { sendImage, sendVideoFrame, closeVideoWebSocket, initVideoWebSocket } from './shared/api.js';
 
 // Inicializa o modo escuro/claro
 initTheme();
@@ -23,10 +23,18 @@ let selectedFile = null;
 let currentOperation = 'canny';
 let videoStream = null;
 let frameInterval = null; // Gerencia o intervalo de processamento contínuo (opcional)
+let isVideoMode = false;
+let isProcessing = false;
 
 // Sliders numéricos
-p1.oninput = () => (val1.innerText = p1.value);
-p2.oninput = () => (val2.innerText = p2.value);
+p1.oninput = () => {
+  val1.innerText = p1.value;
+  if(!isVideoMode && selectedFile) processCurrentFrame();
+};
+p2.oninput = () => {
+  val2.innerText = p2.value;
+  if(!isVideoMode && selectedFile) processCurrentFrame();
+};
 
 // Troca de sub-filtro na barra lateral
 document.querySelectorAll('.subfilter-btn').forEach((btn) => {
@@ -34,6 +42,9 @@ document.querySelectorAll('.subfilter-btn').forEach((btn) => {
     document.querySelectorAll('.subfilter-btn').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
     currentOperation = btn.dataset.op;
+
+    // Atualiza o preview se for uma imagem estatica
+    if(!isVideoMode && selectedFile) processCurrentFrame();
   };
 });
 
@@ -52,6 +63,9 @@ fileUpload.onchange = (e) => {
 
   // Verifica se é vídeo
   if (file.type.startsWith('video/')) {
+    isVideoMode = true;
+    btnExecute.disabled = true;
+
     videoElement.srcObject = null;
     videoElement.src = fileUrl;
     videoElement.controls = true;
@@ -62,30 +76,58 @@ fileUpload.onchange = (e) => {
 
     // Dispara a captura contínua apenas enquanto o vídeo toca (descomente para usar)
     videoElement.onplay = () => {
-      // frameInterval = setInterval(processCurrentFrame, 1000); 
+      startVideoStream();
     };
-    videoElement.onpause = () => clearInterval(frameInterval);
-    videoElement.onended = () => clearInterval(frameInterval);
+    videoElement.onpause = () => stopVideoStream();
+    videoElement.onended = () => {
+      stopVideoStream();
+      closeVideoWebSocket();
+    };
 
   } 
   // Verifica se é imagem
   else if (file.type.startsWith('image/')) {
+    isVideoMode = false;
+    btnExecute.disabled = false;
+
     videoElement.pause();
     videoElement.style.display = 'none';
 
     previewOriginal.src = fileUrl;
     previewOriginal.style.display = 'block';
     placeholderInput.style.display = 'none';
+
+    processCurrentFrame(); // Aplica o filtro inicial
   }
 };
 
 // Processamento via OpenCV (Manual via botão)
 btnExecute.onclick = async () => {
-  await processCurrentFrame();
+  if (isVideoMode || !previewResult.src) return;
+
+  // Guarda o resultado atual da tela
+  const currentResultUrl = previewResult.src;
+
+  // Coloca o resultado original como imagem original
+  previewOriginal.src = currentResultUrl;
+
+  try {
+    // Converte a URL para um arquivo 
+    const res = await fetch(currentResultUrl);
+    const blob = await res.blob();
+    selectedFile = new File([blob], 'imagem-processada.jpg', {type: 'image/jpeg'});
+
+    // Dispara um novo processamento
+    processCurrentFrame();
+  } catch (err) {
+    console.error('Erro ao converter resultado para imagem original: ', err);
+  }
 };
 
 // Lógica de processamento isolada para ser reutilizável
 async function processCurrentFrame() {
+  if (isProcessing) return;
+
   // Verifica se a origem é um vídeo em execução (Webcam ou Arquivo local)
   const isVideoSource = videoStream || (selectedFile && selectedFile.type.startsWith('video/'));
   
@@ -94,6 +136,7 @@ async function processCurrentFrame() {
 
   if (!fileToProcess) return alert('Selecione uma imagem, vídeo ou ative a câmera primeiro!');
 
+  isProcessing = true;
   const t0 = performance.now();
   latencyBadge.innerText = 'Processando...';
 
@@ -114,6 +157,8 @@ async function processCurrentFrame() {
   } catch (err) {
     latencyBadge.innerText = 'Erro';
     alert(err.message);
+  } finally {
+    isProcessing = false;
   }
 }
 
@@ -130,6 +175,9 @@ btnWebcam.onclick = async () => {
     }
 
     videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+    isVideoMode = true;
+    btnExecute.disabled = true;
     
     videoElement.srcObject = videoStream;
     videoElement.src = ""; // Limpa vídeos locais caso existam
@@ -140,9 +188,30 @@ btnWebcam.onclick = async () => {
     placeholderInput.style.display = 'none';
     
     btnWebcam.innerText = 'Desativar Câmera';
+
+    initVideoWebSocket((processedUrl) =>{
+      if(processedUrl){
+        if (previewResult.src.startsWith('blob:')) {
+          URL.revokeObjectURL(previewResult.src);
+        }
+        previewResult.src = processedUrl;
+        previewResult.style.display = 'block';
+        previewResult.previousElementSibling.style.display = 'none';
+      }
+
+      // Libera a trava mesmo que der errado
+      isProcessing = false;
+    })
     
-    // Inicia captura contínua da webcam (descomente para usar)
-    // frameInterval = setInterval(processCurrentFrame, 1000);
+    // Inicia captura contínua da webcam
+    frameInterval = setInterval(async () =>{
+      if (isProcessing) return;
+
+      const blob = await captureCurrentFrame();
+      if (blob) {
+        isProcessing = sendVideoFrame(blob);
+      }
+    }, 40);
 
   } catch (err) {
     stopWebcam();
@@ -157,6 +226,7 @@ function stopWebcam() {
   if (videoStream) {
     videoStream.getTracks().forEach((track) => track.stop());
     videoStream = null;
+    closeVideoWebSocket();
   }
   
   videoElement.srcObject = null;
@@ -166,15 +236,52 @@ function stopWebcam() {
 
   // Restaura a visualização anterior dependendo do arquivo selecionado
   if (selectedFile && selectedFile.type.startsWith('image/')) {
+    isVideoMode = false;
+    btnExecute.disabled = false;
     previewOriginal.style.display = 'block';
     placeholderInput.style.display = 'none';
   } else if (selectedFile && selectedFile.type.startsWith('video/')) {
+    isVideoMode = true;
+    btnExecute.disabled = true;
     videoElement.style.display = 'block';
     placeholderInput.style.display = 'none';
   } else {
+    isVideoMode = false;
+    btnExecute.disabled = false;
     previewOriginal.style.display = 'none';
     placeholderInput.style.display = 'block';
   }
+}
+
+function startVideoStream() {
+  initVideoWebSocket((processedUrl) =>{
+    if(processedUrl){
+      if (previewResult.src.startsWith('blob:')){
+        URL.revokeObjectURL(previewResult.src);
+      }
+      previewResult.src = processedUrl;
+      previewResult.style.display = 'block';
+      previewResult.previousElementSibling.style.display = 'none';
+    }
+    isProcessing = false;
+  });
+
+  // Fecha os intervalos para evitar duplicação
+  if (frameInterval) clearInterval(frameInterval);
+
+  frameInterval = setInterval(async () => {
+    if (isProcessing) return;
+    
+    const blob = await captureCurrentFrame();
+    if (blob){
+      isProcessing = sendVideoFrame(blob);
+    }
+  }, 40);
+}
+
+function stopVideoStream(){
+  if (frameInterval) clearInterval(frameInterval);
+
 }
 
 // Captura do Canvas

@@ -15,3 +15,51 @@ export async function sendImage(file, operation, p1 = 100, p2 = 200) {
   const blob = await res.blob();
   return URL.createObjectURL(blob);
 }
+
+let ws = null;
+
+export function initVideoWebSocket(onFrameReceived) {
+  // Evita abrir muitas conexões
+  if (ws && ws.readyState == WebSocket.OPEN) return;
+
+  const protocol = window.location.protocol == 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${protocol}//${window.location.host}/api/ws/process`;
+
+  // Cria um novo WebSocket
+  ws = new WebSocket(wsUrl);
+  ws.binaryType = 'blob';
+
+  ws.onopen = () => console.log('Tunel websocket aberto');
+
+  ws.onmessage = (event) => {
+    if (!(event.data instanceof Blob)) {
+      console.error('Resposta inesperada do WebSocket:', event.data);
+      onFrameReceived(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(event.data);
+    onFrameReceived(url);
+  };
+
+  ws.onerror = (error) => console.error('Erro no WebSocket: ', error);
+  ws.onclose = () => console.log('WebSocket fechado');
+}
+
+// Envia mensagem se o websocket estiver aberto
+export function sendVideoFrame(blob) {
+  if(ws && ws.readyState == WebSocket.OPEN){
+    ws.send(blob);
+    return true;
+  }
+
+  return false;
+}
+
+export function closeVideoWebSocket() {
+  if (ws) {
+    ws.close();
+    ws = null;
+  }
+}
+
