@@ -87,11 +87,16 @@
           <div class="card-header"><span>Original</span></div>
           <div class="image-dropzone">
             <span class="placeholder-text">Nenhuma imagem carregada</span>
+            <!-- Imagem estática -->
             <img id="previewOriginal" style="display: none;" alt="Original" />
+
+            <!-- Elemento de video e webcam -->
+            <video id="videoElement" autoplay playsinline style="display: none; width: 100%;"></video>
+            <canvas id="canvasElement" style="display: none;;"></canvas>
           </div>
           <div class="card-footer">
-            <input type="file" id="fileUpload" accept="image/*" style="display: none;" />
-            <button class="btn-primary" onclick="document.getElementById('fileUpload').click()">Enviar Imagem</button>
+            <input type="file" id="fileUpload" accept="image/*, video/*" style="display: none;" />
+            <button class="btn-primary" onclick="document.getElementById('fileUpload').click()">Enviar Arquivo</button>
           </div>
         </section>
 
