@@ -30,7 +30,7 @@ const filtersConfig = {
     {id: 'p1', type: 'range', label: 'limiar de corte', min: 0, max: 255, value: 127}
   ],
   'log': [
-    {id: 'p1', type: 'range', label: 'c', min: 0, max: 10, value: 3}
+    {id: 'p1', type: 'range', label: 'c', min: 0.1, max: 3, value: 1.5, step:0.1}
   ],
   'potencia': [
     {id: 'p1', type: 'range', label: 'gamma', min: 0.1, max: 3, value: 1.5, step: 0.1},
@@ -135,16 +135,16 @@ async function processStaticImage() {
 
   // Coleta parametros
   const p1El = document.getElementById('p1');
-  const p1Value = p1El ? (p1El.type === 'checkbox' ? p1El.checked : p1El.Value) : null;
+  const p1Value = p1El ? (p1El.type === 'checkbox' ? p1El.checked : p1El.value) : null;
   
   const p2El = document.getElementById('p2');
-  const p2Value = p2El ? (p2El.type === 'checkbox' ? p2El.checked : p2El.Value) : null;
+  const p2Value = p2El ? (p2El.type === 'checkbox' ? p2El.checked : p2El.value) : null;
   
   const p3El = document.getElementById('p3')
-  const p3Value = p3El ? (p3El.type === 'checkbox' ? p3El.checked : p3El.Value) : null;
+  const p3Value = p3El ? (p3El.type === 'checkbox' ? p3El.checked : p3El.value) : null;
 
   try {
-    const outputUrl = await sendImage(selectedFile, currentOperation, p1Value, p2Value);
+    const outputUrl = await sendImage(selectedFile, currentOperation, p1Value, p2Value, p3Value);
     updateResultUI(outputUrl);
     
     const duration = Math.round(performance.now() - t0);
@@ -259,6 +259,8 @@ function renderParams(operation){
           timerEnvio = setTimeout(() => {
             processStaticImage();
           }, 500); 
+        } else if (isVideoMode) {
+          pushStateToServer();
         }
       }
     }

@@ -15,4 +15,5 @@ def negative_img(img, p1=None, p2=None, p3=None):
     return 255 - img
 
 def gray_scale_img(img, p1=None, p2=None, p3=None):
+    '''Retornamos a imagem em escala de cinza'''
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

@@ -5,17 +5,21 @@ from backend.app.core.filters_geral import (
     gray_scale_img, negative_img
 )
 
+from backend.app.core.intensidade import (
+    threshold, log, potencia, equalizar, fat_intensidade
+)
+
 FILTER_DISPATCH = {
     # Geral
     'negativo': negative_img,
     'cinza': gray_scale_img,
 
     # Intensidade
-    'threshold': ...,#_apply_threshold,
-    'log': ...,#_apply_log,
-    'potencia': ...,#_apply_power,
-    'equalizar': ...,##_apply_equalize,
-    'fat-intensidade': ...,#_apply_intensity_slicing,
+    'threshold': threshold,
+    'log': log,
+    'potencia': potencia,
+    'equalizar':equalizar,
+    'fat-intensidade': fat_intensidade,
 
     # Espaciais
     'blur-gaussiano': ...,#_apply_gaussian,

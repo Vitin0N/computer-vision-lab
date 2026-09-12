@@ -1,9 +1,10 @@
-export async function sendImage(file, operation, p1 = 100, p2 = 200) {
+export async function sendImage(file, operation, p1 = 100, p2 = 200, p3 = null) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('operation', operation);
   formData.append('p1', p1);
   formData.append('p2', p2);
+  formData.append('p3', p3);
 
   const res = await fetch('/api/process', {
     method: 'POST',
@@ -17,10 +18,14 @@ export async function sendImage(file, operation, p1 = 100, p2 = 200) {
 }
 
 let ws = null;
+let pendingVideoState = null;
 
 export function sendVideoState(state) {
+  pendingVideoState = state;
+
   if(ws && ws.readyState == WebSocket.OPEN) {
-    ws.send(JSON.stringify(state)); // Dispara as novas configurações para o back
+    ws.send(JSON.stringify(pendingVideoState)); // Dispara as novas configurações para o back
+    pendingVideoState = null;
   }
 }
 
@@ -35,7 +40,14 @@ export function initVideoWebSocket(onFrameReceived) {
   ws = new WebSocket(wsUrl);
   ws.binaryType = 'blob';
 
-  ws.onopen = () => console.log('Tunel websocket aberto');
+  ws.onopen = () => {
+    console.log('Tunel websocket aberto');
+
+    if (pendingVideoState) {
+      ws.send(JSON.stringify(pendingVideoState));
+      pendingVideoState = null;
+    }
+  };
 
   ws.onmessage = (event) => {
     if ((event.data instanceof Blob)) {

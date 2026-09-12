@@ -70,7 +70,7 @@ async def process_frame(
     p3: str = Form(None)
 ):
     image_bytes = await file.read()
-    print(f'Recebido {file.filename} | Operação {operation} | p1 {p1} | p2 {p2}')
+    print(f'Recebido {file.filename} | Operação {operation} | p1 {p1} | p2 {p2} | p3 {p3}')
 
     # Transforma a imagem recebida do front para padrão 'cv2'
     np_img = np.frombuffer(image_bytes, np.uint8)
