@@ -28,8 +28,8 @@ async def websocket_process(websocket: WebSocket):
             img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
 
             if img is not None:
-                img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                success, encoded_img = cv2.imencode('.jpg', img_gray, [cv2.IMWRITE_JPEG_QUALITY, 70])
+                bordas = cv2.Canny(img, 50, 190)
+                success, encoded_img = cv2.imencode('.jpg', bordas, [cv2.IMWRITE_JPEG_QUALITY, 70])
 
                 if success:
                     await websocket.send_bytes(encoded_img.tobytes())
