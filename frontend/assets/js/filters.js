@@ -1,5 +1,5 @@
 import { initTheme } from './shared/theme.js';
-import { sendImage } from './shared/api.js';
+import { sendImage, sendVideoState } from './shared/api.js';
 import { initCameraEnvironment, startWebcam, stopWebcam, startVideoProcessing, stopVideoProcessing } from './shared/camera.js';
 
 initTheme();
@@ -11,15 +11,13 @@ const btnExecute = document.getElementById('btnExecute');
 const btnDownload = document.getElementById('btnDownload');
 const btnWebcam = document.getElementById('btnWebcam');
 const latencyBadge = document.getElementById('latencyBadge');
-const val1 = document.getElementById('val1');
-const val2 = document.getElementById('val2');
 const videoElement = document.getElementById('videoElement');
 const canvasElement = document.getElementById('canvasElement');
 const placeholderInput = previewOriginal.previousElementSibling;
 const paramsDinamicosInput = document.getElementById('dynamicParamsContainer')
 
 let selectedFile = null;
-let currentOperation = 'bordas-canny';
+let currentOperation = 'cinza';
 let isVideoMode = false;
 
 let timerEnvio;
@@ -66,6 +64,7 @@ document.querySelectorAll('.subfilter-btn').forEach((btn) => {
     renderParams(currentOperation);
 
     if(!isVideoMode && selectedFile) processStaticImage();
+    else if (isVideoMode) pushStateToServer();
   };
 });
 
@@ -91,7 +90,12 @@ fileUpload.onchange = (e) => {
     previewOriginal.style.display = 'none';
     placeholderInput.style.display = 'none';
 
-    videoElement.onplay = () => startVideoProcessing(updateResultUI);
+    videoElement.play();
+
+    videoElement.onplay = () => {
+      startVideoProcessing(updateResultUI);
+      pushStateToServer();
+    };
     videoElement.onpause = () => stopVideoProcessing();
     videoElement.onended = () => stopVideoProcessing();
 
@@ -131,10 +135,13 @@ async function processStaticImage() {
 
   // Coleta parametros
   const p1El = document.getElementById('p1');
-  const p1Value = p1El ? p1El.value : null;
-
+  const p1Value = p1El ? (p1El.type === 'checkbox' ? p1El.checked : p1El.Value) : null;
+  
   const p2El = document.getElementById('p2');
-  const p2Value = p2El ? p2El.value : null;
+  const p2Value = p2El ? (p2El.type === 'checkbox' ? p2El.checked : p2El.Value) : null;
+  
+  const p3El = document.getElementById('p3')
+  const p3Value = p3El ? (p3El.type === 'checkbox' ? p3El.checked : p3El.Value) : null;
 
   try {
     const outputUrl = await sendImage(selectedFile, currentOperation, p1Value, p2Value);
@@ -155,7 +162,6 @@ btnWebcam.onclick = async () => {
     restoreUI();
     return;
   }
-
   try {
     await startWebcam();
     isVideoMode = true;
@@ -166,8 +172,8 @@ btnWebcam.onclick = async () => {
     placeholderInput.style.display = 'none';
     btnWebcam.innerText = 'Desativar Câmera';
 
-    // Dispara o processador passando a função que pinta a tela como callback
     startVideoProcessing(updateResultUI);
+    pushStateToServer(); 
   } catch (err) {
     alert(`Erro de hardware: ${err.message}`);
   }
@@ -235,11 +241,11 @@ function renderParams(operation){
       input.oninput = (e) => {
         document.getElementById(`val_${param.id}`).innerText = e.target.value;
         if (!isVideoMode && selectedFile) {
-          clearTimeout(timerEnvio); // Cancela o envio anterior se o usuário ainda estiver movendo
-
-          timerEnvio = setTimeout(() => { // Cria um novo cronômetro de envio único
-            processStaticImage();
-          }, 500); 
+          clearTimeout(timerEnvio);
+          timerEnvio = setTimeout(() => { processStaticImage(); }, 500); 
+        } 
+        else if (isVideoMode) {
+          pushStateToServer();
         }
       };
     } else if (input.type === 'checkbox') {
@@ -270,5 +276,20 @@ function renderParams(operation){
     }
 
     paramsDinamicosInput.appendChild(group);
+  });
+}
+
+function pushStateToServer() {
+  if(!isVideoMode) return;
+
+  const p1El = document.getElementById('p1');
+  const p2El = document.getElementById('p2');
+  const p3El = document.getElementById('p3');
+
+  sendVideoState({
+    operation: currentOperation,
+    p1: p1El ? (p1El.type === 'checkbox' ? p1El.checked : p1El.value) : null,
+    p2: p2El ? (p2El.type === 'checkbox' ? p2El.checked : p2El.value) : null,
+    p3: p3El ? (p3El.type === 'checkbox' ? p3El.checked : p3El.value) : null
   });
 }

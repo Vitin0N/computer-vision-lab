@@ -63,8 +63,7 @@ export function stopVideoProcessing() {
 // Função isolada de extração de frame no Canvas (Uso interno do módulo)
 function processNextFrame() {
   if (!isVideoPlaying || isProcessing) return;
-  
-  // Se o vídeo ainda estiver carregando as dimensões, aguarda o próximo ciclo
+
   if (!videoEl.videoWidth) {
     requestAnimationFrame(processNextFrame);
     return;
@@ -76,13 +75,13 @@ function processNextFrame() {
   canvasEl.height = videoEl.videoHeight;
   context.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
 
-  // Converte para Blob e envia
+  // Converte direto para binário otimizado (ignora a leitura da UI aqui)
   canvasEl.toBlob((blob) => {
     if (blob) {
       const sent = sendVideoFrame(blob);
-      if (!sent) isProcessing = false; // Destrava se a conexão falhar instantaneamente
+      if (!sent) isProcessing = false;
     } else {
       isProcessing = false;
     }
-  }, 'image/jpeg', 0.8);
+  }, 'image/jpeg', 0.6);
 }
