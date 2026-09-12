@@ -31,50 +31,42 @@
       <span class="sidebar-title">Filtros</span>
 
       <details class="filter-category" open>
-        <summary>Detecção de bordas</summary>
+        <summary>Geral</summary>
         <div class="filter-options">
-          <button class="subfilter-btn active" data-op="canny">Bordas Canny</button>
-          <button class="subfilter-btn" data-op="sobel">Gradiente Sobel</button>
+          <button class="subfilter-btn active" data-op="negativo">Complemento / Negativo</button>
+          <button class="subfilter-btn" data-op="cinza">Escala de Cinza</button>
         </div>
       </details>
 
       <details class="filter-category">
-        <summary>Desfoque</summary>
+        <summary>Intensidade</summary>
         <div class="filter-options">
-          <button class="subfilter-btn" data-op="blur">Gaussian Blur</button>
-          <button class="subfilter-btn" disabled>Blur mediano <small>Em breve</small></button>
+          <button class="subfilter-btn" data-op="threshold">Limirização</button>
+          <button class="subfilter-btn" data-op="log">Transformação Logarítmica</button>
+          <button class="subfilter-btn" data-op="potencia">Transformação de Potencia</button>
+          <button class="subfilter-btn" data-op="equalizar">Equalização</button>
+          <button class="subfilter-btn" data-op="fat-intensidade">Fatiamento de intensidade</button>
         </div>
       </details>
 
       <details class="filter-category">
-        <summary>Contraste</summary>
+        <summary>Espaciais</summary>
         <div class="filter-options">
-          <button class="subfilter-btn" disabled>Equalização <small>Em breve</small></button>
-          <button class="subfilter-btn" disabled>CLAHE <small>Em breve</small></button>
+          <button class="subfilter-btn" data-op="blur-gaussiano">Blur Gaussiano</button>
+          <button class="subfilter-btn" data-op="media">Filtro de Média</button>
+          <button class="subfilter-btn" data-op="mediana">Filtro de Mediana</button>
+          <button class="subfilter-btn" data-op="max">Filtro de Máximo</button>
+          <button class="subfilter-btn" data-op="min">Filtro de Mínimo</button>
         </div>
       </details>
 
       <details class="filter-category">
-        <summary>Morfologia</summary>
+        <summary>Detecção de Bordas / Realce</summary>
         <div class="filter-options">
-          <button class="subfilter-btn" disabled>Erosão <small>Em breve</small></button>
-          <button class="subfilter-btn" disabled>Dilatação <small>Em breve</small></button>
-        </div>
-      </details>
-
-      <details class="filter-category">
-        <summary>Segmentação</summary>
-        <div class="filter-options">
-          <button class="subfilter-btn" disabled>Threshold Otsu <small>Em breve</small></button>
-          <button class="subfilter-btn" disabled>Threshold adaptativo <small>Em breve</small></button>
-        </div>
-      </details>
-
-      <details class="filter-category">
-        <summary>Formas</summary>
-        <div class="filter-options">
-          <button class="subfilter-btn" disabled>Contornos <small>Em breve</small></button>
-          <button class="subfilter-btn" disabled>Linhas de Hough <small>Em breve</small></button>
+          <button class="subfilter-btn" data-op="bordas-sobel">Detecção de Bordas (Sobel)</button>
+          <button class="subfilter-btn" data-op="bordas-laplace">Detecção de Bordas (Laplace)</button>
+          <button class="subfilter-btn" data-op="bordas-canny">Detecção de Bordas (Canny)</button>
+          <button class="subfilter-btn" data-op="agucamento">Máscara de Aguçamento</button>
         </div>
       </details>
     </aside>
@@ -120,14 +112,7 @@
 
       <!-- Parâmetros do filtro -->
       <section class="params-bar">
-        <div class="param-group">
-          <label>Limiar 1: <span id="val1">100</span></label>
-          <input type="range" id="p1" min="0" max="255" value="100" />
-        </div>
-        <div class="param-group">
-          <label>Limiar 2: <span id="val2">200</span></label>
-          <input type="range" id="p2" min="0" max="255" value="200" />
-        </div>
+        <div id="dynamicParamsContainer"></div>
         <button class="btn-primary" id="btnExecute" style="margin-left: auto;">Aplicar Filtro</button>
       </section>
     </main>

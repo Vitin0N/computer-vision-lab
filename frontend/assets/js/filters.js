@@ -11,33 +11,66 @@ const btnExecute = document.getElementById('btnExecute');
 const btnDownload = document.getElementById('btnDownload');
 const btnWebcam = document.getElementById('btnWebcam');
 const latencyBadge = document.getElementById('latencyBadge');
-const p1 = document.getElementById('p1');
-const p2 = document.getElementById('p2');
 const val1 = document.getElementById('val1');
 const val2 = document.getElementById('val2');
 const videoElement = document.getElementById('videoElement');
 const canvasElement = document.getElementById('canvasElement');
 const placeholderInput = previewOriginal.previousElementSibling;
+const paramsDinamicosInput = document.getElementById('dynamicParamsContainer')
 
 let selectedFile = null;
-let currentOperation = 'canny';
+let currentOperation = 'bordas-canny';
 let isVideoMode = false;
+
+let timerEnvio;
+
+// --- CONFIGURAÇÕES DE PARAMETROS PARA CADA OPERAÇÃO ---
+const filtersConfig = {
+  'negativo': [],
+  'cinza': [],
+  'threshold': [
+    {id: 'p1', type: 'range', label: 'limiar de corte', min: 0, max: 255, value: 127}
+  ],
+  'log': [
+    {id: 'p1', type: 'range', label: 'c', min: 0, max: 10, value: 3}
+  ],
+  'potencia': [
+    {id: 'p1', type: 'range', label: 'gamma', min: 0.1, max: 3, value: 1.5, step: 0.1},
+
+  ],
+  'equalizar': [],
+  'fat-intensidade': [
+    {id: 'p1', type: 'range', label: 'low', min: 0, max: 255, value: 127},
+    {id: 'p2', type: 'range', label: 'upper', min: 0, max: 255, value: 255},
+    {id: 'p3', type: 'checkbox', label: 'preservar fundo', checked: true}
+  ],
+  'blur-gaussiano': [
+    {id: 'p1', type: 'range', label: 'Sigma', min: 1, max: 70, value: 5}
+  ],
+  'media': [
+    {id: 'p1', type: 'range', label: 'Sigma', min: 1, max: 70, value: 5}
+  ]
+  // TODO: fazer os restos dos filtros
+}
 
 // Apresenta os elementos HTML ao motor de câmera
 initCameraEnvironment(videoElement, canvasElement);
 
-// --- MANIPULAÇÃO DE INTERFACE E FILTROS ---
-p1.oninput = () => { val1.innerText = p1.value; if(!isVideoMode && selectedFile) processStaticImage(); };
-p2.oninput = () => { val2.innerText = p2.value; if(!isVideoMode && selectedFile) processStaticImage(); };
-
+  
 document.querySelectorAll('.subfilter-btn').forEach((btn) => {
   btn.onclick = () => {
     document.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+
     currentOperation = btn.dataset.op;
+    renderParams(currentOperation);
+
     if(!isVideoMode && selectedFile) processStaticImage();
   };
 });
+
+// Renderiza os parametros pela primeira vez
+renderParams(currentOperation);
 
 // --- UPLOAD DE ARQUIVOS (FÍSICOS) ---
 fileUpload.onchange = (e) => {
@@ -96,8 +129,15 @@ async function processStaticImage() {
   const t0 = performance.now();
   latencyBadge.innerText = 'Processando...';
 
+  // Coleta parametros
+  const p1El = document.getElementById('p1');
+  const p1Value = p1El ? p1El.value : null;
+
+  const p2El = document.getElementById('p2');
+  const p2Value = p2El ? p2El.value : null;
+
   try {
-    const outputUrl = await sendImage(selectedFile, currentOperation, p1.value, p2.value);
+    const outputUrl = await sendImage(selectedFile, currentOperation, p1Value, p2Value);
     updateResultUI(outputUrl);
     
     const duration = Math.round(performance.now() - t0);
@@ -165,4 +205,70 @@ function restoreUI() {
     videoElement.style.display = 'none';
     placeholderInput.style.display = 'block';
   }
+}
+
+function renderParams(operation){
+  // Limpa o HTML antigo
+  paramsDinamicosInput.innerHTML = '';
+
+  // Procura as configurações dos filtros
+  const params = filtersConfig[operation] || [];
+
+  params.forEach(param => {
+    const group = document.createElement('div');
+    group.className = 'param-group';
+
+    const label = document.createElement('label');
+    label.innerHTML = `${param.label}: <span id="val_${param.id}">${param.value}</span>`;
+
+    const input = document.createElement('input');
+    input.type = param.type;
+    input.id = param.id;
+
+    if (param.type === 'range'){
+      input.max = param.max;
+      input.min = param.min;
+      input.value = param.value;
+      if (param.step) input.step = param.step;  
+
+      // Atualiza o texto e processa a imagem com Debounce
+      input.oninput = (e) => {
+        document.getElementById(`val_${param.id}`).innerText = e.target.value;
+        if (!isVideoMode && selectedFile) {
+          clearTimeout(timerEnvio); // Cancela o envio anterior se o usuário ainda estiver movendo
+
+          timerEnvio = setTimeout(() => { // Cria um novo cronômetro de envio único
+            processStaticImage();
+          }, 500); 
+        }
+      };
+    } else if (input.type === 'checkbox') {
+      label.innerHTML = param.label;
+      input.checked = param.checked;
+
+      input.onchange = () =>{
+        if (!isVideoMode && selectedFile){
+          clearTimeout(timerEnvio);
+
+          timerEnvio = setTimeout(() => {
+            processStaticImage();
+          }, 500); 
+        }
+      }
+    }
+
+    if (input.type === 'checkbox'){
+      group.style.display = 'flex';
+      group.style.flexDirection = 'row-reverse';
+      group.style.alignItems = 'center';
+      group.style.justifyContent = 'flex-end';
+      group.appendChild(label);
+      group.appendChild(input);
+    } else {
+      group.appendChild(label);
+      group.appendChild(input);
+    }
+
+    paramsDinamicosInput.appendChild(group);
+  });
 }

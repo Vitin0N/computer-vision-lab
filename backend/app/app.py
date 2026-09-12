@@ -11,10 +11,6 @@ app = FastAPI(title="VisionLab API")
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 FRONTEND_DIR = BASE_DIR / "frontend"
 
-# Monta assets e pages para acesso direto via URL
-app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="assets")
-app.mount("/pages", StaticFiles(directory=str(FRONTEND_DIR / "pages")), name="pages")
-
 @app.websocket('/api/ws/process')
 async def websocket_process(websocket: WebSocket):
     await websocket.accept()
@@ -76,3 +72,11 @@ async def process_frame(
 @app.get("/")
 def root():
     return FileResponse(FRONTEND_DIR / "index.html")
+
+@app.get('/pages/filters')
+def page_filter():
+    return FileResponse(FRONTEND_DIR / 'pages/filters.html')
+
+# Monta assets e pages para acesso direto via URL
+app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="assets")
+app.mount("/pages", StaticFiles(directory=str(FRONTEND_DIR / "pages")), name="pages")
