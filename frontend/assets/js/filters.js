@@ -47,6 +47,15 @@ const filtersConfig = {
   ],
   'media': [
     {id: 'p1', type: 'range', label: 'Sigma', min: 1, max: 70, value: 5}
+  ], 
+  'mediana': [
+    {id: 'p1', type: 'range', label: 'Sigma', min: 1, max: 70, value: 5}
+  ],
+  'max': [
+    {id: 'p1', type: 'range', label: 'Sigma', min: 0, max: 255, value: 5}
+  ],
+  'min': [
+    {id: 'p1', type: 'range', label: 'Sigma', min: 0, max: 255, value: 5}
   ]
   // TODO: fazer os restos dos filtros
 }

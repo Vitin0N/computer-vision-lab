@@ -427,10 +427,12 @@ a {
 .sidebar {
     display: flex;
     width: 220px;
+    height: calc(100vh - 80px);
     padding: 24px 16px;
     gap: 6px;
     flex-shrink: 0;
     flex-direction: column;
+    overflow-y: auto;
     background: var(--bg-surface);
     border-right: 1px solid var(--border-color);
 }
@@ -680,6 +682,7 @@ a {
 
     .sidebar {
         width: 100%;
+        height: auto;
         padding: 12px 16px;
         flex-direction: row;
         overflow-x: auto;

@@ -9,6 +9,10 @@ from backend.app.core.intensidade import (
     threshold, log, potencia, equalizar, fat_intensidade
 )
 
+from backend.app.core.espaco import (
+    gaussian_blur, media_blur, dilate, erode, mediana_blur
+)
+
 FILTER_DISPATCH = {
     # Geral
     'negativo': negative_img,
@@ -22,11 +26,11 @@ FILTER_DISPATCH = {
     'fat-intensidade': fat_intensidade,
 
     # Espaciais
-    'blur-gaussiano': ...,#_apply_gaussian,
-    'media': ...,#_apply_mean,
-    'mediana': ...,#_apply_median,
-    'max': ...,#_apply_max,
-    'min': ...,#_apply_min,
+    'blur-gaussiano': gaussian_blur,
+    'media': media_blur, 
+    'mediana': mediana_blur,
+    'max': dilate,
+    'min': erode, 
 
     # Detecção de Bordas / Realce
     'bordas-sobel': ...,#_apply_sobel,
