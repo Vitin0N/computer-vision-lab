@@ -13,6 +13,10 @@ from backend.app.core.espaco import (
     gaussian_blur, media_blur, dilate, erode, mediana_blur
 )
 
+from backend.app.core.bordas import (
+    bordas_sobel, agucamento, bordas_laplace, bordas_canny
+)
+
 FILTER_DISPATCH = {
     # Geral
     'negativo': negative_img,
@@ -33,10 +37,10 @@ FILTER_DISPATCH = {
     'min': erode, 
 
     # Detecção de Bordas / Realce
-    'bordas-sobel': ...,#_apply_sobel,
-    'bordas-laplace': ...,#_apply_laplace,
-    'bordas-canny': ...,#_apply_canny,
-    'agucamento':... #_apply_sharpening,
+    'bordas-sobel': bordas_sobel,
+    'bordas-laplace': bordas_laplace,
+    'bordas-canny': bordas_canny,
+    'agucamento': agucamento,
 }
 
 def apply_filter(img, operation, p1=None, p2=None, p3=None):

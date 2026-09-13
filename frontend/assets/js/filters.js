@@ -56,8 +56,25 @@ const filtersConfig = {
   ],
   'min': [
     {id: 'p1', type: 'range', label: 'Sigma', min: 0, max: 255, value: 5}
+  ],
+  'bordas-sobel': [
+    {id: 'p1', type: 'range', label: 'Kernel', min: 1, max: 5, value: 3, step: 2},
+    {id: 'p2', type: 'checkbox', label: 'Aplicar a imagem original', checked: false}
+  ],
+  'bordas-laplace': [
+    {id: 'p1', type: 'range', label: 'Kernel', min: 1, max: 5, value: 3, step: 2},
+    {id: 'p2', type: 'checkbox', label: 'Aplicar a imagem original', checked: false}
+  ],
+  'bordas-canny': [
+    {id: 'p1', type: 'range', label: 'Thres1', min: 0, max: 255, value: 3},
+    {id: 'p2', type: 'range', label: 'Thres2', min: 0, max: 255, value: 3},
+    {id: 'p3', type: 'checkbox', label: 'Aplicar a imagem original', checked: false}
+  ],
+  'agucamento': [
+    {id: 'p1', type: 'range', label: 'Kernel', min: 1, max: 21, value: 3, step: 2},
+    {id: 'p2', type: 'range', label: 'Força Bordas', min: 0.1, max: 1, value: 0.3, step: 0.1},
+    {id: 'p3', type: 'checkbox', label: 'Aplicar a imagem original', checked: false}
   ]
-  // TODO: fazer os restos dos filtros
 }
 
 // Apresenta os elementos HTML ao motor de câmera
