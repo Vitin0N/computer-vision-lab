@@ -27,53 +27,53 @@ const filtersConfig = {
   'negativo': [],
   'cinza': [],
   'threshold': [
-    {id: 'p1', type: 'range', label: 'limiar de corte', min: 0, max: 255, value: 127}
+    {id: 'p1', type: 'range', label: 'Limiar de corte', min: 0, max: 255, value: 127}
   ],
   'log': [
-    {id: 'p1', type: 'range', label: 'c', min: 0.1, max: 3, value: 1.5, step:0.1}
+    {id: 'p1', type: 'range', label: 'Constante', min: 0.1, max: 3, value: 1.5, step:0.1}
   ],
   'potencia': [
-    {id: 'p1', type: 'range', label: 'gamma', min: 0.1, max: 3, value: 1.5, step: 0.1},
+    {id: 'p1', type: 'range', label: 'Gamma', min: 0.1, max: 3, value: 1.5, step: 0.1},
 
   ],
   'equalizar': [],
   'fat-intensidade': [
-    {id: 'p1', type: 'range', label: 'low', min: 0, max: 255, value: 127},
-    {id: 'p2', type: 'range', label: 'upper', min: 0, max: 255, value: 255},
-    {id: 'p3', type: 'checkbox', label: 'preservar fundo', checked: true}
+    {id: 'p1', type: 'range', label: 'Limite inferior', min: 0, max: 255, value: 127},
+    {id: 'p2', type: 'range', label: 'Limite superior', min: 0, max: 255, value: 255},
+    {id: 'p3', type: 'checkbox', label: 'Preservar fundo', checked: true}
   ],
   'blur-gaussiano': [
     {id: 'p1', type: 'range', label: 'Sigma', min: 1, max: 70, value: 5}
   ],
   'media': [
-    {id: 'p1', type: 'range', label: 'Sigma', min: 1, max: 70, value: 5}
+    {id: 'p1', type: 'range', label: 'Tamanho do kernel', min: 1, max: 70, value: 5}
   ], 
   'mediana': [
-    {id: 'p1', type: 'range', label: 'Sigma', min: 1, max: 70, value: 5}
+    {id: 'p1', type: 'range', label: 'Tamanho do kernel', min: 1, max: 70, value: 5}
   ],
   'max': [
-    {id: 'p1', type: 'range', label: 'Sigma', min: 0, max: 255, value: 5}
+    {id: 'p1', type: 'range', label: 'Tamanho do kernel', min: 0, max: 255, value: 5}
   ],
   'min': [
-    {id: 'p1', type: 'range', label: 'Sigma', min: 0, max: 255, value: 5}
+    {id: 'p1', type: 'range', label: 'Tamanho do kernel', min: 0, max: 255, value: 5}
   ],
   'bordas-sobel': [
     {id: 'p1', type: 'range', label: 'Kernel', min: 1, max: 5, value: 3, step: 2},
-    {id: 'p2', type: 'checkbox', label: 'Aplicar a imagem original', checked: false}
+    {id: 'p2', type: 'checkbox', label: 'Aplicar na imagem original', checked: false}
   ],
   'bordas-laplace': [
     {id: 'p1', type: 'range', label: 'Kernel', min: 1, max: 5, value: 3, step: 2},
-    {id: 'p2', type: 'checkbox', label: 'Aplicar a imagem original', checked: false}
+    {id: 'p2', type: 'checkbox', label: 'Aplicar na imagem original', checked: false}
   ],
   'bordas-canny': [
-    {id: 'p1', type: 'range', label: 'Thres1', min: 0, max: 255, value: 3},
-    {id: 'p2', type: 'range', label: 'Thres2', min: 0, max: 255, value: 3},
-    {id: 'p3', type: 'checkbox', label: 'Aplicar a imagem original', checked: false}
+    {id: 'p1', type: 'range', label: 'Limiar 1', min: 0, max: 255, value: 3},
+    {id: 'p2', type: 'range', label: 'Limiar 2', min: 0, max: 255, value: 3},
+    {id: 'p3', type: 'checkbox', label: 'Aplicar na imagem original', checked: false}
   ],
   'agucamento': [
     {id: 'p1', type: 'range', label: 'Kernel', min: 1, max: 21, value: 3, step: 2},
-    {id: 'p2', type: 'range', label: 'Força Bordas', min: 0.1, max: 1, value: 0.3, step: 0.1},
-    {id: 'p3', type: 'checkbox', label: 'Aplicar a imagem original', checked: false}
+    {id: 'p2', type: 'range', label: 'Força das bordas', min: 0.1, max: 1, value: 0.3, step: 0.1},
+    {id: 'p3', type: 'checkbox', label: 'Aplicar na imagem original', checked: false}
   ]
 }
 
@@ -246,6 +246,14 @@ function renderParams(operation){
   // Procura as configurações dos filtros
   const params = filtersConfig[operation] || [];
 
+  if (params.length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.textContent = 'Nenhum parâmetro para configurar';
+    emptyMessage.className = 'empty-params-message';
+    paramsDinamicosInput.appendChild(emptyMessage);
+    return;
+  }
+
   params.forEach(param => {
     const group = document.createElement('div');
     group.className = 'param-group';
@@ -290,7 +298,6 @@ function renderParams(operation){
         }
       }
     }
-
     if (input.type === 'checkbox'){
       group.style.display = 'flex';
       group.style.flexDirection = 'row-reverse';
